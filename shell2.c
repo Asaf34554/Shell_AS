@@ -8,22 +8,23 @@
 #include <string.h>
 #include "shell.h"
 
-
+#define MAX_COMMAND_SIZE 1024
 
 
 int main() {
-    char command[1024];
+    char command[MAX_COMMAND_SIZE];
+    char last_command[MAX_COMMAND_SIZE]="\0";
     char *token;
     char *outfile;
     int i, fd, amper, redirect, retid, status;
     char *argv[10];
     char prompt[256];
-    strcpy(prompt,"Maccabi_Haifa");
+    strcpy(prompt,"Beitar_Jerusalem");
 
     while (1)
     {
         printf("%s: ",prompt);
-        fgets(command, 1024, stdin);
+        fgets(command, MAX_COMMAND_SIZE, stdin);
         command[strlen(command) - 1] = '\0';
 
         /* parse command line */
@@ -49,6 +50,19 @@ int main() {
         else 
             amper = 0; 
 
+        // !! command
+        if (strcmp(argv[0], "!!") == 0) {
+            printf("%s\n", last_command);
+            strcpy(command, last_command);
+            i = 0;
+            token = strtok(command, " ");
+            while (token != NULL) {
+                argv[i] = token;
+                token = strtok(NULL, " ");
+                i++;
+            }
+            argv[i] = NULL;
+        }
 
         if (!strcmp(argv[i - 2], ">") || !strcmp(argv[i - 2], "2>") || !strcmp(argv[i - 2], ">>")) {
             if (!strcmp(argv[i - 2], ">"))
@@ -77,11 +91,12 @@ int main() {
             continue;
         }
 
-
+        //$? command
         if( argv[1] != NULL && !( strcmp(argv[1], "$?"))){        
             strcpy(argv[1],strerror(status));
         }
 
+        //cd command
         if (strcmp(argv[0], "cd") == 0) {
             cd_dir(argv,i);
             continue;
@@ -118,5 +133,9 @@ int main() {
         /* parent continues here */
         if (amper == 0)
             retid = wait(&status);
+        
+        //saves the last executed command
+        strcpy(last_command,command);
+        printf("last com:%s\ncom:%s\n",last_command,command);
     }
 }
