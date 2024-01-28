@@ -6,7 +6,7 @@
 #include "stdlib.h"
 #include "unistd.h"
 #include <string.h>
-#include "shell2.h"
+
 
 
 
@@ -35,22 +35,10 @@ while (1)
         i++;
     }
     argv[i] = NULL;
-    // printf("I is: %d\n",i);
 
     /* Is command empty */
     if (argv[0] == NULL)
         continue;
-    
-    /* Check if the command is for changing the prompt */
-    if (strcmp(argv[0], "prompt") == 0 && strcmp(argv[1], "=") == 0 && i == 3) {
-        strcpy(prompt,argv[2]);
-        continue;
-    }
-    else if(! (strcmp(argv[0], "prompt"))){
-        printf("Commend: prompt = <myprompt>\n");
-        continue;
-    }
-
 
     /* Does command line end with & */ 
     if (! strcmp(argv[i - 1], "&")) {
@@ -61,25 +49,68 @@ while (1)
         amper = 0; 
 
     if (!strcmp(argv[i - 2], ">") || !strcmp(argv[i - 2], "2>") || !strcmp(argv[i - 2], ">>")) {
-        redirect = 1;
+        if (!strcmp(argv[i - 2], ">"))
+            redirect = 1;
+
+        else if(! strcmp(argv[i - 2], "2>"))
+            redirect = 2;
+
+        else
+            redirect = 3;
+        
         argv[i - 2] = NULL;
         outfile = argv[i - 1];
-    }
+    } 
     else
         redirect = 0;
 
 
-    /* for commands not part of the shell command language */ 
+    /* Check if the command is for changing the prompt */
+    if (strcmp(argv[0], "prompt") == 0 && strcmp(argv[1], "=") == 0 && i == 3) {
+        printf("inside prompt\n");
+        strcpy(prompt,argv[2]);
+        continue;
+    }
+    else if(! (strcmp(argv[0], "prompt"))){
+        printf("Commend: prompt = <myprompt>\n");
+        continue;
+    }
 
+
+    if( argv[1] != NULL && !( strcmp(argv[1], "$?"))){        
+        printf("inside $?\n");
+
+        strcpy(argv[1],strerror(status));
+    }
+
+
+
+    /* for commands not part of the shell command language */ 
     if (fork() == 0) { 
         /* redirection of IO ? */
-        if (redirect) {
+        if (redirect == 1) {
             fd = creat(outfile, 0660); 
             close (STDOUT_FILENO) ; 
             dup(fd); 
             close(fd); 
             /* stdout is now redirected */
-        } 
+        }
+        if(redirect == 2){
+            fd = creat(outfile, 0660); 
+            close (STDERR_FILENO) ; 
+            dup(fd); 
+            close(fd); 
+            /* stdout is now redirected */
+        }
+        if (redirect == 3){
+            fd = open(outfile, O_WRONLY | O_APPEND | O_CREAT, 0660);
+            close (STDOUT_FILENO) ; 
+            dup(fd); 
+            close(fd); 
+            /* stdout is now redirected */
+
+        }
+        
         execvp(argv[0], argv);
     }
     /* parent continues here */
