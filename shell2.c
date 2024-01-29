@@ -7,27 +7,46 @@
 #include "unistd.h"
 #include <string.h>
 #include "shell.h"
+#include <signal.h>
+
+
 
 #define MAX_COMMAND_SIZE 1024
+
+void sig_int(int sig){
+    printf("\nYou typed Control-C!\n");
+}
+
 
 
 int main() {
     char command[MAX_COMMAND_SIZE];
-    char last_command[MAX_COMMAND_SIZE]="\0";
+    char last_command[MAX_COMMAND_SIZE];
     char *token;
     char *outfile;
     int i, fd, amper, redirect, retid, status;
     char *argv[10];
     char prompt[256];
-    strcpy(prompt,"Beitar_Jerusalem");
-
+    strcpy(prompt,"Maccabi Haifa");
+    // Handles CTRL+C Signal and ignores it.
+    
+    signal(SIGINT,sig_int);
     while (1)
-    {
-        printf("%s: ",prompt);
+    {   
+        printf("%s: ",prompt);    
         fgets(command, MAX_COMMAND_SIZE, stdin);
         command[strlen(command) - 1] = '\0';
+        
 
-        /* parse command line */
+        if(strncmp(command,"!!",2) ){
+            strcpy(last_command,command);
+        }
+        
+        if(! strcmp(command,"quit")){
+            exit(0);
+        }
+
+        /* parse command line */ 
         i = 0;
         token = strtok (command," ");
         while (token != NULL)
@@ -38,9 +57,11 @@ int main() {
         }
         argv[i] = NULL;
 
+
         /* Is command empty */
         if (argv[0] == NULL)
             continue;
+        
 
         /* Does command line end with & */ 
         if (! strcmp(argv[i - 1], "&")) {
@@ -50,35 +71,57 @@ int main() {
         else 
             amper = 0; 
 
-        // !! command
-        if (strcmp(argv[0], "!!") == 0) {
-            printf("%s\n", last_command);
+        /* Check if the command is for do the */
+        if (strcmp(argv[0], "!!") == 0) {  
+            char tmp[MAX_COMMAND_SIZE] = "\0";
+            if(i > 1){
+                for(int index = 1; index< i;index++){
+                    strcat(tmp,argv[index]);
+                    strcat(tmp," ");
+                }    
+            }
+
             strcpy(command, last_command);
-            i = 0;
+            int j = 0;
             token = strtok(command, " ");
             while (token != NULL) {
-                argv[i] = token;
+                argv[j] = token;
                 token = strtok(NULL, " ");
-                i++;
+                j++;
             }
-            argv[i] = NULL;
+
+            if(i == 1){
+                printf("%s\n", last_command);
+            }
+            else
+                printf("%s %s\n",last_command,tmp);
+
+            token = strtok(tmp, " ");
+            while (token != NULL) {
+                argv[j] = token;
+                token = strtok(NULL, " ");
+                j++;
+            }
+            argv[j] = NULL;
+            i = j;  
         }
+        if(i > 2){
+            if (!strcmp(argv[i - 2], ">") || !strcmp(argv[i - 2], "2>") || !strcmp(argv[i - 2], ">>")) {
+                if (!strcmp(argv[i - 2], ">"))
+                    redirect = 1;
 
-        if (!strcmp(argv[i - 2], ">") || !strcmp(argv[i - 2], "2>") || !strcmp(argv[i - 2], ">>")) {
-            if (!strcmp(argv[i - 2], ">"))
-                redirect = 1;
+                else if(! strcmp(argv[i - 2], "2>"))
+                    redirect = 2;
 
-            else if(! strcmp(argv[i - 2], "2>"))
-                redirect = 2;
-
-            else // ">>"
-                redirect = 3;
-            
-            argv[i - 2] = NULL;
-            outfile = argv[i - 1];
-        } 
-        else
-            redirect = 0;
+                else // ">>"
+                    redirect = 3;
+                
+                argv[i - 2] = NULL;
+                outfile = argv[i - 1];
+            } 
+            else
+                redirect = 0;
+        }
 
 
         /* Check if the command is for changing the prompt */
@@ -103,7 +146,9 @@ int main() {
         }
 
         /* for commands not part of the shell command language */ 
-        if (fork() == 0) { 
+        if (fork() == 0) {
+            signal(SIGINT,SIG_DFL); 
+
             /* redirection of IO ? */
             if (redirect == 1) { // ">"
                 fd = creat(outfile, 0660); 
@@ -127,15 +172,18 @@ int main() {
                 /* stdout is now redirected */
 
             }
-            
-            execvp(argv[0], argv);
+            int statusc = execvp(argv[0], argv);
+            if(statusc == -1){
+                perror("Unvalid command");
+                exit(1);
+            }
         }
         /* parent continues here */
         if (amper == 0)
             retid = wait(&status);
         
-        //saves the last executed command
-        strcpy(last_command,command);
-        printf("last com:%s\ncom:%s\n",last_command,command);
+        // //saves the last executed command
+        // strcpy(last_command,command);
+        // printf("last com:%s\ncom:%s\n",last_command,command);
     }
 }
