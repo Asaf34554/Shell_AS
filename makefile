@@ -5,14 +5,14 @@ CXX=gcc
 CXXFLAGS= -Wall -g
 
 HEADERS=shell.h
-OBJECTS=shell2.o shell2functions.o
-SOURCES=shell2.c shell2functions.c
+OBJECTS=shell2.o 
+SOURCES=shell2.c 
 
 all: myshell
 	./$^
 
 mem_test: myshell
-	valgrind ./$^
+	valgrind --leak-check=full --show-leak-kinds=all ./$^
 
 myshell: $(OBJECTS)
 	$(CXX) $(CXXFLAGS) $^ -o myshell
