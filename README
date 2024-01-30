@@ -1,0 +1,52 @@
+# Custom Shell Implementation in C
+
+## Overview
+This is a custom shell implementation written in C. The shell provides a command-line interface for users to interact with the operating system. It supports various features found in standard Unix shells such as bash.
+
+## Features
+- **Basic Commands**: Execute standard shell commands like `ls`, `cd`, `pwd`, `echo`, etc.
+- **Command Execution**: Execute commands with or without arguments.
+- **Command Pipelines**: Support for command pipelines using the `|` operator.
+- **Input/Output Redirection**: Redirect standard input and output using `>`, `2>`, and `>>`.
+- **Command History**: Retrieve the last executed command using the `!!` command.
+- **Customizable Prompt**: Customize the shell prompt with `prompt = <myprompt>`.
+- **Variable Assignment**: Assign and use variables using `$`.
+- **Conditional Execution**: Implement `if-then-else-fi` constructs for conditional command execution.
+- **Variable Reading**: Read variables from user input with the `read` command.
+
+## Installation
+1. Clone the repository to your local machine:
+    `git clone <repository_url>`
+
+2. Navigate to the project directory:
+    `cd simple-shell-c`
+
+3. Compile the shell and runnig the shell:
+    `make`
+
+
+## Usage
+To execute the shell, run the generated executable:
+    `./myshell`
+
+## Supported Commands
+- Basic shell commands like `ls`, `pwd`, `cd`, etc.
+- Piping commands using the `|` operator
+- I/O redirection with `>`, `2>`, and `>>`
+- Command history retrieval using `!!`
+- Customizing prompt with `prompt = <myprompt>`
+- Variable assignment using `$`
+- `if-then-else-fi` constructs for conditional execution
+- Reading variables with the `read` command
+
+## Sample Usage
+    `prompt = MyShell`
+    `$ echo Hello, World!`
+    `Hello, World!`
+    `$ ls -l | grep .txt`
+`...`
+
+
+
+
+

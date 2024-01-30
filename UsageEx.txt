@@ -1,0 +1,83 @@
+assaf@assaf-VirtualBox:~/Desktop/advanced System/shell_example$ ./myshell
+hello: ls
+makefile  myshell  README  shell1.c  shell2.c  shell2.o  shell3.c  shell.h
+hello: ls -l
+total 92
+-rw-rw-r-- 1 assaf assaf   343 Jan 30 20:21 makefile
+-rwxrwxr-x 1 assaf assaf 29424 Jan 30 20:59 myshell
+-rw-rw-r-- 1 assaf assaf     0 Jan 30 20:22 README
+-rw-rw-r-- 1 assaf assaf  1032 Jan 29 21:11 shell1.c
+-rw-rw-r-- 1 assaf assaf 12491 Jan 30 20:58 shell2.c
+-rw-rw-r-- 1 assaf assaf 27496 Jan 30 20:59 shell2.o
+-rw-rw-r-- 1 assaf assaf  2687 Dec 21  2022 shell3.c
+-rw-rw-r-- 1 assaf assaf   429 Jan 30 19:58 shell.h
+hello: ls -l > test.txt
+hello: cat test.txt
+total 92
+-rw-rw-r-- 1 assaf assaf   343 Jan 30 20:21 makefile
+-rwxrwxr-x 1 assaf assaf 29424 Jan 30 20:59 myshell
+-rw-rw-r-- 1 assaf assaf     0 Jan 30 20:22 README
+-rw-rw-r-- 1 assaf assaf  1032 Jan 29 21:11 shell1.c
+-rw-rw-r-- 1 assaf assaf 12491 Jan 30 20:58 shell2.c
+-rw-rw-r-- 1 assaf assaf 27496 Jan 30 20:59 shell2.o
+-rw-rw-r-- 1 assaf assaf  2687 Dec 21  2022 shell3.c
+-rw-rw-r-- 1 assaf assaf   429 Jan 30 19:58 shell.h
+-rw-rw---- 1 assaf assaf     0 Jan 30 21:01 test.txt
+hello: ls -l nofile 2> test.txt
+hello: cat test.txt
+ls: cannot access 'nofile': No such file or directory
+hello: echo append >> test.txt
+hello: cat test.txt
+ls: cannot access 'nofile': No such file or directory
+append
+hello: prompt = lo     
+lo: prompt = assaf
+assaf: echo 122 122 lalall $?
+122 122 lalall 0
+assaf: echo 1 2
+1 2
+assaf: echo
+
+assaf: $?
+assaf: echo $?
+0
+assaf: ls -l nofile   
+ls: cannot access 'nofile': No such file or directory
+assaf: $?
+assaf: echo $?
+512
+assaf: cd ..
+assaf: ls
+shell_example  tEST  test.txt
+assaf: cd ..
+assaf: ls
+'advanced System'   FinalProject       Marachot    print_A		        Reshatot
+'Android Studio'    log.txt	       Marachot2   print_A.txt		        token
+ _example	    maharahot_hapala   Nodejs	   pycharm-community-2022.3.2   WiseRent
+assaf: cd "advanced System"
+assaf: ls
+shell_example  tEST  test.txt
+assaf: cd shell_example
+assaf: cd
+assaf: ls
+Android			      learn-terraform-docker-container	package-lock.json
+aws-node-http-api-projecta    mat1				Pictures
+config			      Music				Public
+Desktop			      newTest				PycharmProjects
+develop			      node_modules			snap
+Documents		      NumCkass.h			System_Programing_HomeWork
+Downloads		      NumClass.h			Templates
+learn-terraform-aws-instance  package.json			Videos
+assaf: cd Desktop
+assaf: cd "advanced System"
+assaf: ls
+shell_example  tEST  test.txt
+assaf: cd shell_example
+assaf: ls
+makefile  myshell  README  shell1.c  shell2.c  shell2.o  shell3.c  shell.h  test.txt
+assaf: !!
+ls
+makefile  myshell  README  shell1.c  shell2.c  shell2.o  shell3.c  shell.h  test.txt
+assaf: !!
+ls
+makefile  myshell  README  shell1.c  shell2.c  shell2.o  shell3.c  shell.h  test.txt
