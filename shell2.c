@@ -30,7 +30,6 @@ void redct(char** argv,char *outfile,int* i,int* redirect){
         *redirect = 0;
 
 }
-
 void if_then_else(char *comm,char *outcmd,int *t_flag,int *e_flag,const int len){
     /* Function to handle if-then-else-fi conditional statements */
 
@@ -128,10 +127,10 @@ void pipe_hndl(char **cmdbuf, int index){
 
     for (int i = 0; i < index; i++)
     {
-        
+        indx = 0;
         divide_cmd(cmd, &indx, cmdbuf[i], " ");
-        redct(cmd,outfile,&indx,&red);
-        printf("%s\n",cmd[i]);
+        int redi = indx;
+        redct(cmd,outfile,&redi,&red);
         if (i != index - 1){
             if (pipe(fd[i]) == -1){
                 perror("ERROR IN PIPE!\n");
@@ -142,7 +141,6 @@ void pipe_hndl(char **cmdbuf, int index){
         /* Child process */
         if (fork() == 0)
         {
-            signal(SIGINT,SIG_DFL);
             if (i != index - 1)
             {
                 dup2(fd[i][1], STDOUT_FILENO);
@@ -171,17 +169,12 @@ void pipe_hndl(char **cmdbuf, int index){
                     /* stdout is now redirected */
                 }
             }
-            if(i != 0)
+            if (i != 0)
             {
                 dup2(fd[i - 1][0], STDIN_FILENO);
                 close(fd[i - 1][1]);
                 close(fd[i - 1][0]);
             }
-            
-            
-
-            /* redirection of IO ? */
-
             execvp(cmd[0], cmd);
             exit(1);
         }
@@ -198,8 +191,6 @@ void pipe_hndl(char **cmdbuf, int index){
         }
     }
 }
-
-
 
 void read_var(char** argv,vari *varbuff,int *varcount,const int len){
     /* Function to read variable values */
@@ -308,7 +299,7 @@ int main() {
     char pipe_cmd[MAX_COMMAND_SIZE];
     char *token;
     char outfile[MAX_COMMAND_SIZE];
-    int i, fd, amper, redirect, retid, status,pipecount=0,varcount=0,t_flag = 0,e_flag=0;
+    int i, fd, amper, redirect, retid, status,pipecount=0,varcount=0,t_flag = 0,e_flag=0,p_flag = 0;
     char *argv[10];
     char *cmdbuffer[256];
     vari varbuff[20];
@@ -365,10 +356,15 @@ int main() {
                 
                 divide_cmd(cmdbuffer, &pipecount, pipe_cmd, "|");
                 pipe_hndl(cmdbuffer, pipecount);
+                p_flag =1;
                 break;
             }
         }
         argv[i] = NULL;
+        if(p_flag ==1 ){
+            p_flag = 0;
+            continue;
+        }
 
 
         /* Is command empty */
@@ -419,7 +415,22 @@ int main() {
             i = j;  
         }
         if(i > 2){
-            redct(argv,outfile,&i,&redirect);
+            if (!strcmp(argv[i - 2], ">") || !strcmp(argv[i - 2], "2>") || !strcmp(argv[i - 2], ">>")) {
+                if (!strcmp(argv[i - 2], ">"))
+                    redirect = 1;
+
+                else if(! strcmp(argv[i - 2], "2>"))
+                    redirect = 2;
+
+                else // ">>"
+                    redirect = 3;
+                
+                argv[i - 2] = NULL;
+                strcpy(outfile,argv[i-1]);
+                i = i - 2;
+            } 
+            else
+                redirect = 0;
         }
         else
             redirect = 0;
@@ -432,7 +443,7 @@ int main() {
         }
         
         /* Check if the command is for changing the prompt */
-        if (strcmp(argv[0], "prompt") == 0 &&  i == 3 && strcmp(argv[1], "=") == 0) {
+        if (strcmp(argv[0], "prompt") == 0 && strcmp(argv[1], "=") == 0 && i == 3) {
             strcpy(prompt,argv[2]);
             continue;
         }
