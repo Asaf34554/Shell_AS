@@ -81,3 +81,51 @@ makefile  myshell  README  shell1.c  shell2.c  shell2.o  shell3.c  shell.h  test
 assaf: !!
 ls
 makefile  myshell  README  shell1.c  shell2.c  shell2.o  shell3.c  shell.h  test.txt
+assaf: ^C
+You typed Control-C!
+
+assaf: ls -l | wc -c
+574
+assaf: sort colors.txt | uniq -c | sort -r | head -3
+      4 red
+      3 blue
+      2 green
+assaf: ls -l | sort -r | wc -c > output.txt
+assaf: cat output.txt
+574
+assaf: $person = David
+assaf: echo person
+person
+assaf: echo $person
+David
+assaf: $partner_one = Assaf
+assaf: $partner_two = Lior
+assaf: echo $partner_one partner_two
+Assaf partner_two
+assaf: echo $partner_one $partner_two
+Assaf Lior
+assaf: read name
+hello
+assaf: echo $name
+hello
+assaf: read coursename
+progressive_programming
+assaf: echo $coursename 
+progressive_programming
+hello: if date | grep Fri
+then
+echo Shabbat
+else
+echo Weekday
+fi
+Weekday
+hello: if date | grep Wed
+then
+echo Hamishi       
+else
+echo Lo hamishi
+fi
+Wed 31 Jan 2024 14:30:15 IST
+Hamishi
+
+

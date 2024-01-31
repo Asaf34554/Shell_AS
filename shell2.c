@@ -367,7 +367,7 @@ int main() {
             }
         }
         argv[i] = NULL;
-        if(p_flag ==1 ){
+        if(p_flag ==1 && strcmp(argv[0], "if")){
             p_flag = 0;
             continue;
         }
@@ -444,6 +444,7 @@ int main() {
 
         /*Check if the command is if and else*/
         if (!strcmp(argv[0], "if")){
+            if(p_flag == 1) p_flag = 0;
             if_then_else(last_cmd,then_else_cmd,&t_flag,&e_flag,i);
             continue;
         }
