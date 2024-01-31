@@ -130,7 +130,13 @@ void pipe_hndl(char **cmdbuf, int index){
         indx = 0;
         divide_cmd(cmd, &indx, cmdbuf[i], " ");
         int redi = indx;
-        redct(cmd,outfile,&redi,&red);
+        if(indx > 1){
+            redct(cmd,outfile,&redi,&red);
+        }
+        else
+            redi = 0;
+
+        
         if (i != index - 1){
             if (pipe(fd[i]) == -1){
                 perror("ERROR IN PIPE!\n");
